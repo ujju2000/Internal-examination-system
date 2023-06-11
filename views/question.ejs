@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/styles/questions.css">
+</head>
+<body>
+    <form class="subjectContainer" method  = "post" action = '/questions/<%= title %>'>
+        <h1 class ="title"><%= title %></h1>
+        
+        <% if (subject.length > 0) { %>
+            <% for (let i = 0; i < subject.length; i++) { %>
+              <h3 class= "questionNo">Question <%= i + 1 %>:</h3>
+              <p class = "question"><%= subject[i].question %></p>
+              <ul class="options">
+                <% for (let j = 0; j < subject[i].choices.length; j++) { %>
+                  <li class = "option">
+                    <input type="radio" id="choice<%= i + 1 %>-<%= j + 1 %>" name="question<%= i + 1 %>" value="<%= j + 1 %>">
+                    <label for="choice<%= i + 1 %>-<%= j + 1 %>"><%= subject[i].choices[j] %></label>
+                  </li>
+                <% } %>
+              </ul>
+            <% } %>
+            <button class = "submitBtn" type="submit">Submit</button>
+          <% } else { %>
+            <p>No questions available.</p>
+          <% } %>
+          </form>  
+    
+   
+</body>
+</html>
