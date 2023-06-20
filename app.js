@@ -2,9 +2,14 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import ejs from 'ejs';
-import path from 'path';
-
+import path from 'path'; 
+import multer from 'multer';
+import Teacher from './models/adminModel.js';
 import {javaQuestions, cppQuestions,cQuestions,dbmsQuestions} from './info.js';
+
+const upload = multer({dest : 'uploads', fileFilter (req,file,cb) {
+    cb(undefined, true);
+}})
 
 
 const app = express();
@@ -13,7 +18,8 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended : true}));
 app.set('view engine', 'ejs');
 
-mongoose.connect('mongodb+srv://ujjutarika35:Test123@cluster0.ublufxm.mongodb.net/studentDB?retryWrites=true&w=majority');
+mongoose.connect('mongodb+srv://ujjutarika35:Test123@cluster0.ublufxm.mongodb.net/studentDB?retryWrites=true&w=majority')
+.then(() => console.log('server connected')).catch((err) => console.log(err));
 
 
 const studentSchema = new mongoose.Schema(
@@ -62,6 +68,7 @@ app.route('/login.html')
     })
 app.route('/index.html')
     .get((req,res) => res.sendFile(path.resolve() + '/public/files/index.html'));
+
 app.route('/questions')
     .post((req,res)=> {
         const newformDetails =  new FormDetails({
@@ -72,19 +79,23 @@ app.route('/questions')
             subject : req.body.subject
         })
         newformDetails.save();
-        if(req.body.subject === 'java') {
-            res.render('question.ejs', {subject : javaQuestions , title : "java"});
-        }else if(req.body.subject === 'c++') {
-            res.render('question.ejs', {subject : cppQuestions , title : "cpp"});
-        }
-        else if(req.body.subject === 'c') {
-            res.render('question.ejs', {subject : cQuestions , title : "c"});
-        }else {
-            res.render('question.ejs', {subject : dbmsQuestions , title : "dbms"});
-        }
+        FormDetails.findOne({name : req.body.name}).then((found) => {
+            if(req.body.subject === 'java') {
+                res.render('question.ejs', {subject : javaQuestions , title : "java",id : found._id });
+            }else if(req.body.subject === 'c++') {
+                res.render('question.ejs', {subject : cppQuestions , title : "cpp" ,id : found._id});
+            }
+            else if(req.body.subject === 'c') {
+                res.render('question.ejs', {subject : cQuestions , title : "c" ,id : found._id});
+            }else {
+                res.render('question.ejs', {subject : dbmsQuestions ,id : found._id });
+            }
+        }).catch((err) => console.log(err));
+
+       
     })
 
-app.route('/questions/:title')
+app.route('/questions/:id')
 .post((req,res) => {
         let solution = [];
         if(req.params.title === 'java') {
@@ -98,12 +109,54 @@ app.route('/questions/:title')
             solution = dbmsQuestions;
         }
         let result = calculateResult(req.body,solution);
-    
+        // FormDetails.findByIdAndUpdate(req.params.id, {marks : result}).then((foundUser) => console.log("marks update" + foundUser.marks)).catch((err) => console.log(err));
+        FormDetails.findById(req.params.id).then((found) => console.log(found)).catch((err) => console.log(err));
         res.render('result', {title : req.params.title , marks : result});
     })
+
+app.route('/admin')
+    .get((req,res) => {
+        res.sendFile(path.resolve() + '/public/files/adminSignup.html');
+    })
+    .post((req,res) => {
+        console.log(req.body);
+        const newTeacher = new Teacher({
+       id : req.body.id,
+       email : req.body.email,
+       password  : req.body.password
+   }) 
+   newTeacher.save();
+
+   res.sendFile("<h1>Signup Successfull for Teacher <a href = '/adminLogin' >Click here to login!</a> </h1>");
+    })
+
+app.route('/adminLogin')
+    .get((req,res) => {
+    res.sendFile(path.resolve() + '/public/files/adminLogin.html')
+})
+.post((req,res) => {
+        const teacherId = req.body.id;
+        Teacher.findOne({id : teacherId}).then((foundTeacher) => {
+            if(req.body.password === foundTeacher.password) {
+                res.redirect('/adminUser');
+            }else {
+                res.send("<h1>Invalid password! <a href = '/adminLogin' >Try again</a> </h1>");
+            }
+        })
+})
+
+app.route(('/adminUser'))
+    .get((req,res) => {
+        res.sendFile(path.resolve() + '/public/files/admin.html');
+    })
+    .post(upload.single('file') , (req,res) => {
+      console.log(req.body);
+      console.log(req.file.originalname);
+      res.send('hi');
+    })
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('server running'));
-
 
 
 function calculateResult(userSol, solution) {

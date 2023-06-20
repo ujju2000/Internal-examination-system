@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login</title>
+	<link rel="stylesheet" href="/styles/admin.css">
+	
+</head>
+<body>
+	<div class="container">
+
+		<h1>Login</h1>
+		<form action="/adminLogin" method="POST">
+
+			<label  for="id">Teacher Id:</label>
+			<input class = "loginInput" type="text" id="name" name="id" required>
+
+			<label for="password">Password:</label>
+			<input class = "loginInput" type="password" id="password" name="password" required>
+
+			<button type="submit">Login</button>
+		</form>
+		<p>Don't have an account? <a href="/admin">Sign up</a></p>
+	</div>
+</body>
+</html>

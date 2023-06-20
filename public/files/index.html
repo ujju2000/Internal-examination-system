@@ -22,15 +22,15 @@
             <form action="./questions" method = "post">
                 <div class="inputs">
 
-                    <input type="text" name="name" id="" class="name" placeholder="Enter your name">
+                    <input type="text" name="name" id="" class="name" placeholder="Enter your name" required>
                     
-                    <input type="email" name="email" id="" class="email" placeholder="Enter your email">
+                    <input type="email" name="email" id="" class="email" placeholder="Enter your email" required>
                     
-                    <input type="text" name="clgName" id="" class="collegename" placeholder="College name">
+                    <input type="text" name="clgName" id="" class="collegename" placeholder="College name" required>
                     
-                    <input type="text" name="number" id="" class="number" placeholder="Enter your phone number">
+                    <input type="text" name="number" id="" class="number" placeholder="Enter your phone number" minlength="10" maxlength="10" required>
                 </div>  
-               <div class="chooseSub">
+               <div class="chooseSub" required>
                 <input type="radio" name="subject" id="" value = "java"> Java
                 <input type="radio" name="subject" id="" value = "c"> C 
                 <input type="radio" name="subject" id="" value = "c++"> C++
@@ -41,5 +41,7 @@
         </div>
        
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+   
 </body>
 </html>
